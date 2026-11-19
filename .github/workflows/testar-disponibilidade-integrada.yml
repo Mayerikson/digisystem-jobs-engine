@@ -1,0 +1,45 @@
+name: 2.2 - Testar disponibilidade real na Recrutei
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: digisystem-integrated-availability-test
+  cancel-in-progress: false
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Baixar repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Instalar Chromium
+        run: playwright install --with-deps chromium
+
+      - name: Consultar vagas reais e testar UNKNOWN controlado
+        run: python -u testar_disponibilidade_integrada.py
+        env:
+          PYTHONUNBUFFERED: "1"
+
+      - name: Guardar relatorio
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: teste-integrado-disponibilidade-recrutei
+          path: verificacao_integrada_recrutei.json
+          if-no-files-found: warn
+          retention-days: 14
