@@ -1,0 +1,69 @@
+name: 2.7 - Publicar um unico post autorizado
+
+on:
+  workflow_dispatch:
+    inputs:
+      post_date:
+        description: "Data do post em America/Sao_Paulo (deve ser hoje; formato YYYY-MM-DD)."
+        required: true
+        type: string
+      confirmacao:
+        description: "Digite exatamente PUBLICAR para autorizar uma unica publicacao real."
+        required: true
+        type: string
+
+concurrency:
+  group: digisystem-jobs-engine
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  publicar:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: true
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias Python
+        run: pip install -r requirements.txt
+
+      - name: Instalar Chromium do Playwright
+        run: playwright install --with-deps chromium
+
+      - name: Publicar um unico post com autorizacao explicita
+        run: python publish_linkedin.py
+        env:
+          DRY_RUN: "false"
+          LIVE_SINGLE_POST_MODE: "true"
+          LIVE_SINGLE_POST_CONFIRM: ${{ inputs.confirmacao }}
+          LIVE_SINGLE_POST_DATE: ${{ inputs.post_date }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-3.5-flash-lite' }}
+          LINKEDIN_TOKEN: ${{ secrets.LINKEDIN_TOKEN }}
+          LINKEDIN_PERSON_ID: ${{ secrets.LINKEDIN_PERSON_ID }}
+          LINKEDIN_VERSION: ${{ vars.LINKEDIN_VERSION || '202611' }}
+
+      - name: Salvar estado e resumo mesmo se houver falha
+        if: always()
+        run: |
+          set -euo pipefail
+          git config user.name "vagas-bot"
+          git config user.email "vagas-bot@users.noreply.github.com"
+          if [ -f posts.json ]; then git add -- posts.json; fi
+          if [ -f run_summary.json ]; then git add -- run_summary.json; fi
+          if git diff --cached --quiet; then
+            echo "Sem alteracoes para salvar."
+          else
+            git commit -m "registrar publicacao unica autorizada"
+            git push
+          fi
