@@ -1,0 +1,76 @@
+name: 2 - Publicar post do dia
+
+on:
+  schedule:
+    - cron: "0 12 * * 1-5"
+      timezone: "America/Sao_Paulo"
+  workflow_dispatch:
+    inputs:
+      test_date:
+        description: "Data do post a testar em DRY_RUN (YYYY-MM-DD). Vazio = hoje."
+        required: false
+        type: string
+        default: ""
+
+concurrency:
+  group: digisystem-jobs-engine
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias Python
+        run: pip install -r requirements.txt
+
+      - name: Instalar Chromium do Playwright
+        run: playwright install --with-deps chromium
+
+      - name: Validar vagas e publicar post do dia
+        run: python publish_linkedin.py
+        env:
+          # Toda execucao manual e forcada para DRY_RUN, mesmo que a variavel do repo seja false.
+          # Somente o agendamento pode usar vars.DRY_RUN=false apos autorizacao expressa.
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && 'true' || vars.DRY_RUN || 'true' }}
+          DRY_RUN_TEST_DATE: ${{ github.event.inputs.test_date || '' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-3.5-flash-lite' }}
+          LINKEDIN_TOKEN: ${{ secrets.LINKEDIN_TOKEN }}
+          LINKEDIN_PERSON_ID: ${{ secrets.LINKEDIN_PERSON_ID }}
+          LINKEDIN_VERSION: ${{ vars.LINKEDIN_VERSION || '202611' }}
+
+      - name: Salvar estado e resumo mesmo se houver falha
+        if: always()
+        run: |
+          git config user.name "vagas-bot"
+          git config user.email "vagas-bot@users.noreply.github.com"
+          if [ -f posts.json ]; then git add posts.json; fi
+          if [ -f run_summary.json ]; then git add run_summary.json; fi
+          if ! git diff --cached --quiet; then
+            git commit -m "registrar validacao e publicacao diaria"
+            git push
+          else
+            echo "Sem alteracoes para salvar."
+          fi
+
+      - name: Guardar evidencia da execucao
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resultado-publicador-diario
+          path: |
+            run_summary.json
+            posts.json
+          if-no-files-found: warn
+          retention-days: 14
