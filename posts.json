@@ -15,11 +15,69 @@
     ],
     "qtd_vagas": 9,
     "texto": "A Digisystem abriu oportunidades para profissionais de Suporte.\n\nAnalista de Suporte N2 Jr — Brasília, DF → https://jobs.recrutei.com.br/digisystem/vacancy/108736-analista-de-suporte-n2-jr\nTecnico de Atendimento e Suporte de 1º Nivel — Brasília, DF → https://jobs.recrutei.com.br/digisystem/vacancy/119475-tecnico-de-atendimento-e-suporte-de-1o-nivel\nAnalista de Suporte Monitoramento SOC — São Paulo, SP → https://jobs.recrutei.com.br/digisystem/vacancy/156195-analista-de-suporte-monitoramento-soc\nAnalista de Suporte PL — Brasília, DF → https://jobs.recrutei.com.br/digisystem/vacancy/160619-analista-de-suporte-pl\nAnalista de Sistemas /Suporte I — Fortaleza, CE → https://jobs.recrutei.com.br/digisystem/vacancy/161107-analista-de-sistemas-suporte-i\nAnalista de Sistemas /Suporte I — Fortaleza, CE → https://jobs.recrutei.com.br/digisystem/vacancy/161111-analista-de-sistemas-suporte-i\nTécnico de Suporte — Mogi Guaçu, SP → https://jobs.recrutei.com.br/digisystem/vacancy/163224-tecnico-de-suporte\nTecnico de Atendimento e Suporte de 1º Nivel — Brasília, DF → https://jobs.recrutei.com.br/digisystem/vacancy/164180-tecnico-de-atendimento-e-suporte-de-1o-nivel\nAnalista de Suporte Pleno — Fortaleza, CE → https://jobs.recrutei.com.br/digisystem/vacancy/164364-analista-de-suporte-pleno\n\n#Vagas #Oportunidade #Emprego #Digier #Suporte #TI #Tecnologia\nCompartilhe com quem possa se interessar! 🙌",
-    "status": "PENDING_VALIDATION",
+    "status": "DRY_RUN_VALIDATED",
     "publicado": false,
     "linkedin_post_urn": null,
     "attempts": 0,
-    "last_error": null
+    "last_error": null,
+    "last_verified_at": "2026-11-19T18:34:17-03:00",
+    "verification": {
+      "DIGI-561AEF40EE8D19F9": {
+        "status": "ACTIVE",
+        "reason": "Formulario acessivel e vinculado ao ID especifico da vaga, com campos de candidato",
+        "http_status": 200,
+        "last_verified_at": "2026-11-19T18:33:19-03:00"
+      },
+      "DIGI-C70DC43F1DD6C984": {
+        "status": "ACTIVE",
+        "reason": "Formulario acessivel e vinculado ao ID especifico da vaga, com campos de candidato",
+        "http_status": 200,
+        "last_verified_at": "2026-11-19T18:33:29-03:00"
+      },
+      "DIGI-6E6308D3F5C17BF2": {
+        "status": "ACTIVE",
+        "reason": "Formulario acessivel e vinculado ao ID especifico da vaga, com campos de candidato",
+        "http_status": 200,
+        "last_verified_at": "2026-11-19T18:33:35-03:00"
+      },
+      "DIGI-9C6F6FA561BE7953": {
+        "status": "ACTIVE",
+        "reason": "Formulario acessivel e vinculado ao ID especifico da vaga, com campos de candidato",
+        "http_status": 200,
+        "last_verified_at": "2026-11-19T18:33:41-03:00"
+      },
+      "DIGI-45EB91DFFBDA85B9": {
+        "status": "ACTIVE",
+        "reason": "Formulario acessivel e vinculado ao ID especifico da vaga, com campos de candidato",
+        "http_status": 200,
+        "last_verified_at": "2026-11-19T18:33:47-03:00"
+      },
+      "DIGI-A7E5AB973EB30756": {
+        "status": "ACTIVE",
+        "reason": "Formulario acessivel e vinculado ao ID especifico da vaga, com campos de candidato",
+        "http_status": 200,
+        "last_verified_at": "2026-11-19T18:33:54-03:00"
+      },
+      "DIGI-439C7E7E894A6131": {
+        "status": "ACTIVE",
+        "reason": "Formulario acessivel e vinculado ao ID especifico da vaga, com campos de candidato",
+        "http_status": 200,
+        "last_verified_at": "2026-11-19T18:34:00-03:00"
+      },
+      "DIGI-5A3869BF040133F0": {
+        "status": "ACTIVE",
+        "reason": "Formulario acessivel e vinculado ao ID especifico da vaga, com campos de candidato",
+        "http_status": 200,
+        "last_verified_at": "2026-11-19T18:34:05-03:00"
+      },
+      "DIGI-A438573C7ECCBC33": {
+        "status": "ACTIVE",
+        "reason": "Formulario acessivel e vinculado ao ID especifico da vaga, com campos de candidato",
+        "http_status": 200,
+        "last_verified_at": "2026-11-19T18:34:11-03:00"
+      }
+    },
+    "updated_at": "2026-11-19T18:34:17-03:00"
   },
   {
     "data": "2026-12-02",

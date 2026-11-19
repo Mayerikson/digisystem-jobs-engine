@@ -1,8 +1,26 @@
 {
-  "started_at": "2026-11-19T18:27:26-03:00",
-  "date": "2026-11-19",
+  "started_at": "2026-11-19T18:33:16-03:00",
+  "date": "2026-12-01",
   "mode": "DRY_RUN",
-  "status": "SUCCESS_NO_POST_SCHEDULED",
-  "posts_processed": [],
-  "finished_at": "2026-11-19T18:27:26-03:00"
+  "status": "SUCCESS",
+  "posts_processed": [
+    {
+      "date": "2026-12-01",
+      "area": "Suporte",
+      "result": "dry_run_validated",
+      "status": "DRY_RUN_VALIDATED",
+      "vacancy_ids": [
+        "DIGI-561AEF40EE8D19F9",
+        "DIGI-C70DC43F1DD6C984",
+        "DIGI-6E6308D3F5C17BF2",
+        "DIGI-9C6F6FA561BE7953",
+        "DIGI-45EB91DFFBDA85B9",
+        "DIGI-A7E5AB973EB30756",
+        "DIGI-439C7E7E894A6131",
+        "DIGI-5A3869BF040133F0",
+        "DIGI-A438573C7ECCBC33"
+      ]
+    }
+  ],
+  "finished_at": "2026-11-19T18:34:17-03:00"
 }
