@@ -6,10 +6,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: digisystem-test-availability
+  cancel-in-progress: false
+
 jobs:
   verificar:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Baixar repositorio
         uses: actions/checkout@v4
@@ -26,8 +30,23 @@ jobs:
       - name: Instalar Chromium
         run: playwright install --with-deps chromium
 
+      - name: Coletar vagas atuais da Digisystem
+        run: python -u vagas_pipeline.py
+        env:
+          PYTHONUNBUFFERED: "1"
+
+      - name: Confirmar arquivo da coleta
+        run: |
+          if [ ! -s vagas_digisystem.csv ]; then
+            echo "ERRO: o coletor nao gerou vagas_digisystem.csv ou o arquivo esta vazio."
+            exit 1
+          fi
+          echo "CSV encontrado: $(wc -l < vagas_digisystem.csv) linhas, incluindo cabecalho."
+
       - name: Verificar amostra de vagas
         run: python -u testar_disponibilidade.py
+        env:
+          PYTHONUNBUFFERED: "1"
 
       - name: Guardar resultados da verificacao
         if: always()
@@ -35,7 +54,11 @@ jobs:
         with:
           name: verificacao-disponibilidade-digisystem
           path: |
+            vagas_digisystem.csv
+            vagas_digisystem.xlsx
             verificacao_amostra.json
             verificacao_amostra.csv
+            prompt_pronto.txt
+            screenshot_erro.png
           if-no-files-found: warn
           retention-days: 14
