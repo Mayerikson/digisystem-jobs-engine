@@ -1,0 +1,66 @@
+name: 2.5 - Validar autenticacao LinkedIn
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Validar token e identidade OAuth sem publicar
+        env:
+          LINKEDIN_TOKEN: ${{ secrets.LINKEDIN_TOKEN }}
+          LINKEDIN_PERSON_ID: ${{ secrets.LINKEDIN_PERSON_ID }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import sys
+          from urllib.error import HTTPError, URLError
+          from urllib.request import Request, urlopen
+
+          token = os.environ.get("LINKEDIN_TOKEN", "").strip()
+          expected = os.environ.get("LINKEDIN_PERSON_ID", "").strip()
+
+          if not token:
+              sys.exit("ERRO: Secret LINKEDIN_TOKEN ausente ou vazio.")
+          if not expected:
+              sys.exit("ERRO: Secret LINKEDIN_PERSON_ID ausente ou vazio.")
+
+          request = Request(
+              "https://api.linkedin.com/v2/userinfo",
+              headers={
+                  "Authorization": f"Bearer {token}",
+                  "Accept": "application/json",
+              },
+              method="GET",
+          )
+
+          try:
+              with urlopen(request, timeout=20) as response:
+                  status = response.status
+                  payload = json.loads(response.read().decode("utf-8"))
+          except HTTPError as exc:
+              # Nao imprimir o corpo da resposta para evitar expor dados desnecessarios.
+              sys.exit(f"ERRO: LinkedIn UserInfo respondeu HTTP {exc.code}. Confira validade do token e escopos openid/profile.")
+          except (URLError, TimeoutError) as exc:
+              sys.exit(f"ERRO: falha de rede ao consultar LinkedIn UserInfo: {type(exc).__name__}.")
+          except Exception as exc:
+              sys.exit(f"ERRO: nao foi possivel validar a resposta OAuth: {type(exc).__name__}.")
+
+          subject = str(payload.get("sub", "")).strip()
+          if not subject:
+              sys.exit("ERRO: resposta OAuth nao trouxe o campo sub.")
+
+          if subject != expected:
+              sys.exit("ERRO: LINKEDIN_PERSON_ID nao corresponde ao usuario autenticado. Corrija o Secret usando o campo sub retornado pelo UserInfo; nao publique o valor nos logs.")
+
+          print(f"HTTP UserInfo: {status}")
+          print("Token OAuth: valido para consulta UserInfo.")
+          print("Identidade: LINKEDIN_PERSON_ID corresponde ao perfil autenticado.")
+          print("Publicacao: nenhuma tentativa realizada.")
+          PY
