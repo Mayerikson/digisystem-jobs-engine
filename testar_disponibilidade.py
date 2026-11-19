@@ -1,3 +1,67 @@
+"""Testa disponibilidade de vagas atuais e de uma vaga informada manualmente.
+
+Nao publica no LinkedIn e nao chama o Gemini.
+Inclui sempre a vaga de Governanca de Dados SPS0001946 para investigar
+uma reclamacao recebida no LinkedIn, mesmo que ela nao apareca na listagem atual.
+"""
+from __future__ import annotations
+
+import asyncio
+import json
+import sys
+from pathlib import Path
+
+import pandas as pd
+
+from vagas_pipeline import verificar_disponibilidade_vagas
+
+ARQUIVO_CSV = Path("vagas_digisystem.csv")
+ARQUIVO_JSON = Path("verificacao_amostra.json")
+ARQUIVO_RESULTADO_CSV = Path("verificacao_amostra.csv")
+
+# Caso real informado pelo usuario. Incluido mesmo se nao estiver na listagem atual.
+VAGA_RECLAMADA = {
+    "ID": "TESTE-MANUAL-SPS0001946",
+    "Vaga": "Analista de Governanca de Dados (SPS0001946)",
+    "Detalhes": "Caso de reclamacao no LinkedIn; teste pontual de disponibilidade",
+    "Link de Inscrição": (
+        "https://jobs.recrutei.com.br/digisystem/vacancy/"
+        "156893-analista-de-governanca-de-dados-sps0001946"
+    ),
+    "Tipo de teste": "Vaga reclamada - verificacao manual",
+}
+
+
+def selecionar_amostra(df: pd.DataFrame) -> pd.DataFrame:
+    dados_governanca = df["Vaga"].astype(str).str.contains(
+        r"dados|governan", case=False, regex=True, na=False
+    )
+    selecionadas = df.loc[dados_governanca].copy()
+    ids_selecionados = set(selecionadas["ID"].astype(str))
+
+    grupos = [
+        r"suporte|atendimento",
+        r"desenvolvedor|desenvolvimento|programador",
+        r"infraestrutura|devops|nuvem",
+        r"tasy|saude",
+        r"lider|projetos|analista de sistemas",
+    ]
+    for padrao in grupos:
+        candidatas = df[
+            df["Vaga"].astype(str).str.contains(
+                padrao, case=False, regex=True, na=False
+            )
+            & ~df["ID"].astype(str).isin(ids_selecionados)
+        ]
+        if not candidatas.empty:
+            linha = candidatas.iloc[[0]]
+            selecionadas = pd.concat([selecionadas, linha], ignore_index=True)
+            ids_selecionados.add(str(linha.iloc[0]["ID"]))
+
+    selecionadas = selecionadas.drop_duplicates(subset=["ID"])
+    return selecionadas.head(12)
+
+
 async def main() -> int:
     if not ARQUIVO_CSV.exists():
         print(f"ERRO: arquivo nao encontrado: {ARQUIVO_CSV}", file=sys.stderr)
