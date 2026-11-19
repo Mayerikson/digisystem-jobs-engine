@@ -1,0 +1,112 @@
+name: 1 - Gerar posts do mes
+
+on:
+  schedule:
+    - cron: "0 11 1 * *" # Dia 1 de cada mes, as 08h00 em America/Sao_Paulo (UTC-3)
+  workflow_dispatch:
+    inputs:
+      target_month:
+        description: "Mes a gerar (YYYY-MM). Vazio: proximo mes se executado apos o dia 1."
+        required: false
+        type: string
+        default: ""
+
+concurrency:
+  group: digisystem-jobs-engine
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  gerar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: true
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias Python
+        run: pip install -r requirements.txt
+
+      - name: Instalar Chromium do Playwright
+        run: playwright install --with-deps chromium
+
+      - name: Definir mes-alvo da geracao
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_TARGET_MONTH: ${{ inputs.target_month }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${EVENT_NAME}" == "schedule" ]]; then
+            TARGET_MONTH="$(TZ=America/Sao_Paulo date +%Y-%m)"
+          elif [[ -n "${INPUT_TARGET_MONTH}" ]]; then
+            TARGET_MONTH="${INPUT_TARGET_MONTH}"
+          else
+            HOJE="$(TZ=America/Sao_Paulo date +%F)"
+            DIA="${HOJE##*-}"
+            MES_ATUAL="${HOJE:0:7}"
+            if (( 10#${DIA} > 1 )); then
+              PRIMEIRO_DIA="${MES_ATUAL}-01"
+              TARGET_MONTH="$(date -u -d "${PRIMEIRO_DIA} +1 month" +%Y-%m)"
+            else
+              TARGET_MONTH="${MES_ATUAL}"
+            fi
+          fi
+
+          if [[ ! "${TARGET_MONTH}" =~ ^[0-9]{4}-(0[1-9]|1[0-2])$ ]]; then
+            echo "TARGET_MONTH invalido: use YYYY-MM (ex.: 2026-12)." >&2
+            exit 1
+          fi
+
+          echo "TARGET_MONTH=${TARGET_MONTH}" >> "${GITHUB_ENV}"
+          echo "Mes-alvo definido: ${TARGET_MONTH}"
+
+      - name: Extrair vagas e montar prompt
+        run: python vagas_pipeline.py
+
+      - name: Gerar posts com Gemini em lotes e fallback Groq
+        run: python generate_posts.py
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-3.5-flash-lite' }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_MODEL: ${{ vars.GROQ_MODEL || 'openai/gpt-oss-20b' }}
+          GROQ_FREE_TIER_CONFIRMED: ${{ vars.GROQ_FREE_TIER_CONFIRMED || 'true' }}
+
+      - name: Salvar posts e fotografia das vagas
+        run: |
+          set -euo pipefail
+          git config user.name "vagas-bot"
+          git config user.email "vagas-bot@users.noreply.github.com"
+
+          git add posts.json vagas_digisystem.csv
+
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteracao para salvar."
+          else
+            git commit -m "atualizar vagas e posts do mes"
+            git push
+          fi
+
+      - name: Salvar evidencias da geracao
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: vagas-e-prompt
+          if-no-files-found: warn
+          path: |
+            prompt_pronto.txt
+            posts.json
+            posts_parciais.json
+            vagas_digisystem.csv
+            vagas_digisystem.xlsx
+            screenshot_erro.png
