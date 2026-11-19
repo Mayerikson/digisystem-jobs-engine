@@ -338,11 +338,21 @@
     ],
     "qtd_vagas": 1,
     "texto": "A Digisystem abriu oportunidades para profissionais de Governanca & Processos.\n\n📍 Brasília, DF\n\nPlanejamento e Gestão de Projetos → https://jobs.recrutei.com.br/digisystem/vacancy/153542-planejamento-e-gestao-de-projetos\n\n#Vagas #Oportunidade #Emprego #Digier #Dados #DataScience #Governanca\nCompartilhe com quem possa se interessar! 🙌",
-    "status": "PENDING_VALIDATION",
+    "status": "DRY_RUN_VALIDATED",
     "publicado": false,
     "linkedin_post_urn": null,
     "attempts": 0,
-    "last_error": null
+    "last_error": null,
+    "last_verified_at": "2026-11-19T16:28:44-03:00",
+    "verification": {
+      "DIGI-CAD303A641B98E3B": {
+        "status": "ACTIVE",
+        "reason": "Formulario acessivel e vinculado ao ID especifico da vaga, com campos de candidato",
+        "http_status": 200,
+        "last_verified_at": "2026-11-19T16:28:38-03:00"
+      }
+    },
+    "updated_at": "2026-11-19T16:28:44-03:00"
   },
   {
     "data": "2026-12-22",

@@ -1,0 +1,18 @@
+{
+  "started_at": "2026-11-19T16:28:38-03:00",
+  "date": "2026-12-21",
+  "mode": "DRY_RUN",
+  "status": "SUCCESS",
+  "posts_processed": [
+    {
+      "date": "2026-12-21",
+      "area": "Governanca & Processos",
+      "result": "dry_run_validated",
+      "status": "DRY_RUN_VALIDATED",
+      "vacancy_ids": [
+        "DIGI-CAD303A641B98E3B"
+      ]
+    }
+  ],
+  "finished_at": "2026-11-19T16:28:44-03:00"
+}
