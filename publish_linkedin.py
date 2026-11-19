@@ -17,6 +17,7 @@ import json
 import os
 import re
 import sys
+import subprocess
 import time
 import unicodedata
 from datetime import date, datetime
@@ -101,6 +102,45 @@ def salvar_json_atomico(caminho: Path, dados: Any) -> None:
 def log_evento(evento: str, **campos: Any) -> None:
     registro = {"timestamp": agora_iso(), "event": evento, **campos}
     print(json.dumps(registro, ensure_ascii=False, default=str))
+
+
+def persistir_estado_remoto_antes_da_publicacao() -> None:
+    """Persiste PUBLISHING no GitHub antes de chamar a API externa.
+
+    Se a persistencia falhar, a chamada ao LinkedIn nao e realizada. Isso
+    fecha a janela em que um post poderia ser publicado sem que o estado
+    anti-duplicidade chegasse ao branch principal.
+    """
+    if os.getenv("GITHUB_ACTIONS", "").strip().lower() != "true":
+        raise PublicacaoError(
+            "Publicacao real bloqueada fora do GitHub Actions: nao foi possivel "
+            "garantir a persistencia remota do estado anti-duplicidade."
+        )
+
+    comandos = [
+        ["git", "config", "user.name", "vagas-bot"],
+        ["git", "config", "user.email", "vagas-bot@users.noreply.github.com"],
+        ["git", "add", "--", str(ARQUIVO_POSTS)],
+        ["git", "commit", "-m", "marcar post como PUBLISHING antes do LinkedIn"],
+        ["git", "push"],
+    ]
+    for comando in comandos:
+        resultado = subprocess.run(
+            comando,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+        if resultado.returncode != 0:
+            detalhe = (resultado.stderr or resultado.stdout or "sem detalhe").strip()
+            raise PublicacaoError(
+                "Nao foi possivel persistir o estado PUBLISHING no GitHub; "
+                "nenhuma chamada ao LinkedIn foi feita. "
+                f"Comando: {comando[0]}. Detalhe: {detalhe[:500]}"
+            )
+
+    log_evento("publishing_state_persisted_remotely", date=agora_iso())
 
 
 def carregar_vagas_csv() -> dict[str, dict[str, str]]:
@@ -461,6 +501,16 @@ def processar_post(post: dict[str, Any], vagas_csv: dict[str, dict[str, str]]) -
     post["publish_started_at"] = agora_iso()
     post["last_error"] = None
     salvar_json_atomico(ARQUIVO_POSTS, POSTS_EM_MEMORIA)
+
+    try:
+        persistir_estado_remoto_antes_da_publicacao()
+    except Exception as exc:
+        # Sabemos que a chamada ao LinkedIn ainda nao aconteceu.
+        post["status"] = "FAILED"
+        post["last_error"] = f"Falha ao persistir PUBLISHING antes do envio: {exc}"
+        post["updated_at"] = agora_iso()
+        salvar_json_atomico(ARQUIVO_POSTS, POSTS_EM_MEMORIA)
+        raise PublicacaoError(post["last_error"]) from exc
 
     try:
         urn, http_status = publicar_no_linkedin(texto)
