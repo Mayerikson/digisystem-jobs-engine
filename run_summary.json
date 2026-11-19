@@ -1,18 +1,8 @@
 {
-  "started_at": "2026-11-19T16:59:00-03:00",
-  "date": "2026-12-21",
+  "started_at": "2026-11-19T18:27:26-03:00",
+  "date": "2026-11-19",
   "mode": "DRY_RUN",
-  "status": "SUCCESS",
-  "posts_processed": [
-    {
-      "date": "2026-12-21",
-      "area": "Governanca & Processos",
-      "result": "dry_run_validated",
-      "status": "DRY_RUN_VALIDATED",
-      "vacancy_ids": [
-        "DIGI-CAD303A641B98E3B"
-      ]
-    }
-  ],
-  "finished_at": "2026-11-19T16:59:08-03:00"
+  "status": "SUCCESS_NO_POST_SCHEDULED",
+  "posts_processed": [],
+  "finished_at": "2026-11-19T18:27:26-03:00"
 }
