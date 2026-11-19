@@ -1,0 +1,55 @@
+name: Monitorar vencimento do token LinkedIn
+
+on:
+  schedule:
+    # Executa diariamente às 08:00 no horário de Brasília (11:00 UTC).
+    - cron: "0 11 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: digisystem-token-linkedin-monitor
+  cancel-in-progress: false
+
+jobs:
+  monitorar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Verificar data de vencimento e emitir alertas
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPIRACAO="2027-01-18"
+          HOJE="$(TZ=America/Sao_Paulo date +%F)"
+          HOJE_EPOCH="$(date -u -d "${HOJE} 00:00:00" +%s)"
+          EXPIRACAO_EPOCH="$(date -u -d "${EXPIRACAO} 00:00:00" +%s)"
+          DIAS_RESTANTES="$(( (EXPIRACAO_EPOCH - HOJE_EPOCH) / 86400 ))"
+
+          echo "Data local: ${HOJE} (America/Sao_Paulo)"
+          echo "Vencimento cadastrado: ${EXPIRACAO}"
+          echo "Dias restantes: ${DIAS_RESTANTES}"
+
+          case "${DIAS_RESTANTES}" in
+            7)
+              echo "::error title=Token LinkedIn vence em 7 dias::Renove o token até 18/01/2027 e atualize o Secret LINKEDIN_TOKEN no GitHub."
+              exit 1
+              ;;
+            3)
+              echo "::error title=Token LinkedIn vence em 3 dias::A renovação é urgente. Atualize o Secret LINKEDIN_TOKEN no GitHub."
+              exit 1
+              ;;
+            0)
+              echo "::error title=Token LinkedIn vence hoje::Renove o token imediatamente e atualize o Secret LINKEDIN_TOKEN."
+              exit 1
+              ;;
+            *)
+              if (( DIAS_RESTANTES < 0 )); then
+                echo "::warning title=Data de vencimento do token ultrapassada::A data cadastrada passou. Confira o token e atualize EXPIRACAO neste workflow após renová-lo."
+              else
+                echo "Token fora da janela de alerta. Nenhuma ação necessária."
+              fi
+              ;;
+          esac
