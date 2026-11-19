@@ -43,7 +43,7 @@ jobs:
           fi
           echo "CSV encontrado: $(wc -l < vagas_digisystem.csv) linhas, incluindo cabecalho."
 
-      - name: Verificar amostra de vagas
+      - name: Diagnosticar paginas e formularios de candidatura
         run: python -u testar_disponibilidade.py
         env:
           PYTHONUNBUFFERED: "1"
@@ -59,6 +59,7 @@ jobs:
             verificacao_amostra.json
             verificacao_amostra.csv
             prompt_pronto.txt
+            diagnostico_governanca.png
             screenshot_erro.png
           if-no-files-found: warn
           retention-days: 14
