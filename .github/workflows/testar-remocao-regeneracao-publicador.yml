@@ -1,0 +1,46 @@
+name: 2.4 - Testar remocao e regeneracao antes da publicacao
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: digisystem-test-remocao-regeneracao
+  cancel-in-progress: false
+
+jobs:
+  testar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Baixar repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Instalar Chromium
+        run: playwright install --with-deps chromium
+
+      - name: Testar vaga ativa, vaga encerrada e regeneracao Gemini
+        run: python -u testar_remocao_regeneracao_publicador.py
+        env:
+          DRY_RUN: "true"
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-3.5-flash-lite' }}
+
+      - name: Salvar relatorio
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: teste-remocao-regeneracao-publicador
+          path: teste_remocao_regeneracao_publicador.json
+          if-no-files-found: warn
