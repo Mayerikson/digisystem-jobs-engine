@@ -1,0 +1,60 @@
+name: 1 - Gerar posts do mes
+
+on:
+  schedule:
+    - cron: "0 11 1 * *" # 08h00 America/Sao_Paulo (UTC-3)
+  workflow_dispatch:
+
+concurrency:
+  group: digisystem-jobs-engine
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  gerar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias Python
+        run: pip install -r requirements.txt
+
+      - name: Instalar Chromium do Playwright
+        run: playwright install --with-deps chromium
+
+      - name: Extrair vagas e montar prompt
+        run: python vagas_pipeline.py
+
+      - name: Gerar posts com Gemini em lotes
+        run: python generate_posts.py
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-3.5-flash-lite' }}
+
+      - name: Salvar posts e fotografia das vagas
+        run: |
+          git config user.name "vagas-bot"
+          git config user.email "vagas-bot@users.noreply.github.com"
+          git add posts.json vagas_digisystem.csv
+          git commit -m "atualizar vagas e posts do mes" || echo "sem mudancas"
+          git push
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vagas-e-prompt
+          path: |
+            prompt_pronto.txt
+            posts.json
+            posts_parciais.json
+            vagas_digisystem.csv
+            vagas_digisystem.xlsx
+            screenshot_erro.png
