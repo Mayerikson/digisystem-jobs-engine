@@ -1,0 +1,33 @@
+name: 2.6 - Testar persistencia antes da publicacao
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: digisystem-persistencia-pre-publicacao-test
+  cancel-in-progress: false
+
+jobs:
+  testar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Testar persistencia e ordem das chamadas
+        env:
+          GITHUB_ACTIONS: "true"
+        run: python testar_persistencia_prepublicacao.py
