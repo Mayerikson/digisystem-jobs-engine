@@ -1,0 +1,45 @@
+name: 2.3 - Testar publicador integrado com Recrutei
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: digisystem-publicador-integrado-teste
+  cancel-in-progress: false
+
+jobs:
+  testar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Baixar repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Instalar Chromium
+        run: playwright install --with-deps chromium
+
+      - name: Executar teste integrado sem LinkedIn
+        run: python testar_publicador_integrado_recrutei.py
+        env:
+          DRY_RUN: "true"
+
+      - name: Salvar relatorio
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: teste-publicador-integrado-recrutei
+          path: teste_publicador_integrado_recrutei.json
+          if-no-files-found: warn
+          retention-days: 14
