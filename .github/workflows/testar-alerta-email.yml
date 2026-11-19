@@ -1,0 +1,21 @@
+name: Testar notificacao por e-mail do GitHub Actions
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  testar-email:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Gerar falha controlada para testar notificacao
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "TESTE INTENCIONAL: esta execucao deve falhar para acionar a notificacao de Actions."
+          echo "Nenhum codigo do publicador sera executado e nenhuma publicacao sera feita."
+          echo "::error title=Teste de e-mail::Falha controlada solicitada para validar o recebimento de notificacoes do GitHub Actions."
+          exit 1

@@ -1,0 +1,63 @@
+name: Monitorar vencimento do token LinkedIn
+
+on:
+  schedule:
+    # 08:00 America/Sao_Paulo (11:00 UTC).
+    - cron: "0 11 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: digisystem-token-linkedin-monitor
+  cancel-in-progress: false
+
+jobs:
+  monitorar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    env:
+      TOKEN_EXPIRATION_DATE: "2027-01-18"
+    steps:
+      - name: Verificar vencimento e emitir alertas
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          EXPIRACAO="${TOKEN_EXPIRATION_DATE}"
+          if ! date -u -d "${EXPIRACAO}" >/dev/null 2>&1 || [[ "$(date -u -d "${EXPIRACAO}" +%F)" != "${EXPIRACAO}" ]]; then
+            echo "::error title=Data de expiracao invalida::Confira TOKEN_EXPIRATION_DATE no workflow."
+            exit 1
+          fi
+
+          HOJE="$(TZ=America/Sao_Paulo date +%F)"
+          HOJE_EPOCH="$(date -u -d "${HOJE} 00:00:00" +%s)"
+          EXPIRACAO_EPOCH="$(date -u -d "${EXPIRACAO} 00:00:00" +%s)"
+          DIAS_RESTANTES="$(( (EXPIRACAO_EPOCH - HOJE_EPOCH) / 86400 ))"
+
+          echo "Data local: ${HOJE} (America/Sao_Paulo)"
+          echo "Vencimento cadastrado: ${EXPIRACAO}"
+          echo "Dias restantes: ${DIAS_RESTANTES}"
+
+          case "${DIAS_RESTANTES}" in
+            7)
+              echo "::error title=Token LinkedIn vence em 7 dias::Renove o token e atualize o Secret LINKEDIN_TOKEN no GitHub."
+              exit 1
+              ;;
+            3)
+              echo "::error title=Token LinkedIn vence em 3 dias::Renovacao urgente. Atualize o Secret LINKEDIN_TOKEN no GitHub."
+              exit 1
+              ;;
+            0)
+              echo "::error title=Token LinkedIn vence hoje::Renove o token e atualize o Secret LINKEDIN_TOKEN imediatamente."
+              exit 1
+              ;;
+            *)
+              if (( DIAS_RESTANTES < 0 )); then
+                echo "::warning title=Data de vencimento ultrapassada::O prazo cadastrado passou. Confira o token, atualize LINKEDIN_TOKEN e ajuste TOKEN_EXPIRATION_DATE apos a renovacao. Nenhum novo e-mail diario sera provocado por este monitor."
+              else
+                echo "Token fora da janela de alerta. Nenhuma acao necessaria."
+              fi
+              ;;
+          esac
