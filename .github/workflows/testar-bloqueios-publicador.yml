@@ -1,0 +1,33 @@
+name: 2.1 - Testar bloqueios de seguranca do publicador
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: digisystem-publisher-safety-tests
+  cancel-in-progress: false
+
+jobs:
+  testar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Baixar repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Executar testes CLOSED, UNKNOWN e ACTIVE
+        env:
+          DRY_RUN: "true"
+        run: python -m unittest -v testar_bloqueios_publicador.py
