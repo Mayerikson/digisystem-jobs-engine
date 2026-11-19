@@ -1,26 +1,10 @@
 {
-  "started_at": "2026-11-19T19:21:51-03:00",
-  "date": "2026-12-01",
-  "mode": "DRY_RUN",
-  "status": "SUCCESS",
-  "posts_processed": [
-    {
-      "date": "2026-12-01",
-      "area": "Suporte",
-      "result": "dry_run_validated",
-      "status": "DRY_RUN_VALIDATED",
-      "vacancy_ids": [
-        "DIGI-561AEF40EE8D19F9",
-        "DIGI-C70DC43F1DD6C984",
-        "DIGI-6E6308D3F5C17BF2",
-        "DIGI-9C6F6FA561BE7953",
-        "DIGI-45EB91DFFBDA85B9",
-        "DIGI-A7E5AB973EB30756",
-        "DIGI-439C7E7E894A6131",
-        "DIGI-5A3869BF040133F0",
-        "DIGI-A438573C7ECCBC33"
-      ]
-    }
-  ],
-  "finished_at": "2026-11-19T19:22:44-03:00"
+  "started_at": "2026-11-19T19:37:56-03:00",
+  "date": null,
+  "mode": "LIVE_SINGLE_CONTROLLED",
+  "status": "FAILED",
+  "posts_processed": [],
+  "error_type": "PublicacaoError",
+  "error": "Por seguranca, o modo live controlado so pode publicar o post da data atual em America/Sao_Paulo. Data solicitada: 2026-12-01; data local: 2026-11-19.",
+  "finished_at": "2026-11-19T19:37:56-03:00"
 }
