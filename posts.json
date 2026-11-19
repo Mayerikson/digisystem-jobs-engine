@@ -20,64 +20,64 @@
     "linkedin_post_urn": null,
     "attempts": 0,
     "last_error": null,
-    "last_verified_at": "2026-11-19T18:34:17-03:00",
+    "last_verified_at": "2026-11-19T19:22:44-03:00",
     "verification": {
       "DIGI-561AEF40EE8D19F9": {
         "status": "ACTIVE",
         "reason": "Formulario acessivel e vinculado ao ID especifico da vaga, com campos de candidato",
         "http_status": 200,
-        "last_verified_at": "2026-11-19T18:33:19-03:00"
+        "last_verified_at": "2026-11-19T19:21:54-03:00"
       },
       "DIGI-C70DC43F1DD6C984": {
         "status": "ACTIVE",
         "reason": "Formulario acessivel e vinculado ao ID especifico da vaga, com campos de candidato",
         "http_status": 200,
-        "last_verified_at": "2026-11-19T18:33:29-03:00"
+        "last_verified_at": "2026-11-19T19:22:00-03:00"
       },
       "DIGI-6E6308D3F5C17BF2": {
         "status": "ACTIVE",
         "reason": "Formulario acessivel e vinculado ao ID especifico da vaga, com campos de candidato",
         "http_status": 200,
-        "last_verified_at": "2026-11-19T18:33:35-03:00"
+        "last_verified_at": "2026-11-19T19:22:06-03:00"
       },
       "DIGI-9C6F6FA561BE7953": {
         "status": "ACTIVE",
         "reason": "Formulario acessivel e vinculado ao ID especifico da vaga, com campos de candidato",
         "http_status": 200,
-        "last_verified_at": "2026-11-19T18:33:41-03:00"
+        "last_verified_at": "2026-11-19T19:22:11-03:00"
       },
       "DIGI-45EB91DFFBDA85B9": {
         "status": "ACTIVE",
         "reason": "Formulario acessivel e vinculado ao ID especifico da vaga, com campos de candidato",
         "http_status": 200,
-        "last_verified_at": "2026-11-19T18:33:47-03:00"
+        "last_verified_at": "2026-11-19T19:22:17-03:00"
       },
       "DIGI-A7E5AB973EB30756": {
         "status": "ACTIVE",
         "reason": "Formulario acessivel e vinculado ao ID especifico da vaga, com campos de candidato",
         "http_status": 200,
-        "last_verified_at": "2026-11-19T18:33:54-03:00"
+        "last_verified_at": "2026-11-19T19:22:22-03:00"
       },
       "DIGI-439C7E7E894A6131": {
         "status": "ACTIVE",
         "reason": "Formulario acessivel e vinculado ao ID especifico da vaga, com campos de candidato",
         "http_status": 200,
-        "last_verified_at": "2026-11-19T18:34:00-03:00"
+        "last_verified_at": "2026-11-19T19:22:28-03:00"
       },
       "DIGI-5A3869BF040133F0": {
         "status": "ACTIVE",
         "reason": "Formulario acessivel e vinculado ao ID especifico da vaga, com campos de candidato",
         "http_status": 200,
-        "last_verified_at": "2026-11-19T18:34:05-03:00"
+        "last_verified_at": "2026-11-19T19:22:33-03:00"
       },
       "DIGI-A438573C7ECCBC33": {
         "status": "ACTIVE",
         "reason": "Formulario acessivel e vinculado ao ID especifico da vaga, com campos de candidato",
         "http_status": 200,
-        "last_verified_at": "2026-11-19T18:34:11-03:00"
+        "last_verified_at": "2026-11-19T19:22:38-03:00"
       }
     },
-    "updated_at": "2026-11-19T18:34:17-03:00"
+    "updated_at": "2026-11-19T19:22:44-03:00"
   },
   {
     "data": "2026-12-02",
