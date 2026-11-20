@@ -1,10 +1,8 @@
 {
-  "started_at": "2026-11-19T19:37:56-03:00",
-  "date": null,
-  "mode": "LIVE_SINGLE_CONTROLLED",
-  "status": "FAILED",
+  "started_at": "2026-11-20T19:13:19-03:00",
+  "date": "2026-11-20",
+  "mode": "LIVE",
+  "status": "SUCCESS_NO_POST_SCHEDULED",
   "posts_processed": [],
-  "error_type": "PublicacaoError",
-  "error": "Por seguranca, o modo live controlado so pode publicar o post da data atual em America/Sao_Paulo. Data solicitada: 2026-12-01; data local: 2026-11-19.",
-  "finished_at": "2026-11-19T19:37:56-03:00"
+  "finished_at": "2026-11-20T19:13:19-03:00"
 }
